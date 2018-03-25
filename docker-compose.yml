@@ -18,6 +18,8 @@ services:
 
     expose:
       - 5000
+    depends_on:
+      - ade-parser
 
   nginx:
     build:
