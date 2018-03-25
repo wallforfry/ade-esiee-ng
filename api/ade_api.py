@@ -6,17 +6,15 @@ Date : 25/03/18
 """
 import csv
 import json
+import logging
 import re
 from datetime import datetime, timedelta
 
 import requests
 from xml.etree import ElementTree
 
-class ADEApi():
-    project_id = "7"
-    base_url = "https://planif.esiee.fr/jsp/webapi"
-    session_id = ""
 
+class ADEApi():
     events = ()
     groups_and_unites = ()
     unites = ()
@@ -24,29 +22,16 @@ class ADEApi():
 
     def __init__(self):
         self._get_events_from_xml()
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
         pass
 
-    def update_events(self):
-        self._connect()
-        self._set_project_id()
-        self._set_events_to_xml()
-        self._disconnect()
-
-    def _connect(self):
-        url = self.base_url + "?function=connect&login=lecteur1&password="
-
-        response = requests.get(url)
-
-        tree = ElementTree.fromstring(response.text)
-
-        self.session_id = tree.attrib["id"]
-
-    def _disconnect(self):
-        url = self.base_url + "?function=disconnect"
-
-        response = requests.get(url)
-
-        return response.status_code == 200
+    def _get_events_from_xml(self):
+        try:
+            tree = ElementTree.parse("data/ade.xml")
+            self.events = tree.getroot().findall("event")
+        except FileNotFoundError as e:
+            print(e)
+            logging.error("[ADE-API] ade xml file not found")
 
     def set_groups_unites(self, aurion_data):
         self.groups_and_unites = tuple()
@@ -61,29 +46,6 @@ class ADEApi():
                 d = dict([("unite", self.format_unites(data)), ("groupe", group)])
                 self.groups_and_unites += tuple([d])
                 self.unites += tuple([self.format_unites(data)])
-
-    def _set_project_id(self):
-        url = self.base_url + "?sessionId=" + self.session_id + "&function=setProject&projectId=" + self.project_id
-
-        response = requests.get(url)
-
-        return response.status_code == 200
-
-    def _get_events_from_xml(self):
-        try:
-            tree = ElementTree.parse("ade.xml")
-            self.events = tree.getroot().findall("event")
-        except FileNotFoundError as e:
-            print(e)
-            self.update_events()
-
-    def _set_events_to_xml(self):
-        url = self.base_url + "?sessionId=" + self.session_id + "&function=getEvents&tree=true&detail=8"
-
-        response = requests.get(url)
-
-        with open("ade.xml", mode="w") as f:
-            f.write(response.text)
 
     @staticmethod
     def groups_finder(data):
@@ -264,7 +226,7 @@ class ADEApi():
 
                     obj = {"name": name, "prof": ", ".join(instructors), "rooms": " ".join(classrooms),
                            "start": start, "end": end, "unite": self.search_unite_from_csv(unite),
-                           "description": unite + " " + " ".join(instructors)+ " " +" ".join(group)}
+                           "description": unite + " " + " ".join(instructors) + " " + " ".join(group)}
                     if obj not in result:
                         result.append(obj)
 

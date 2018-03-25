@@ -8,6 +8,7 @@ import urllib.request
 import urllib.error
 
 import json
+from xml.etree import ElementTree
 
 import requests
 from icalendar import Calendar
@@ -57,14 +58,6 @@ def ics_to_json_from_ade():
         f.close()
         logging.info("[ADE-PARSER] Json file is up to date")
 
-def main():
-    if download_ics_from_planif():
-        ics_to_json_from_ade()
-        logging.info("[ADE-PARSER] Calendar is up to date")
-    download_aurion_groups()
-    download_unites()
-    threading.Timer(600, main).start()
-
 
 def download_aurion_groups():
     url = "http://test.wallforfry.fr/BDE_MES_GROUPES.csv"
@@ -88,6 +81,67 @@ def download_unites():
         file.writelines(f)
         file.close()
         logging.info("[ADE-PARSER] Unites names are up to date")
+
+
+class ADEDownloader():
+    project_id = "7"
+    base_url = "https://planif.esiee.fr/jsp/webapi"
+    session_id = ""
+
+    def update_events(self):
+        self._connect()
+        self._set_project_id()
+        self._set_events_to_xml()
+        self._disconnect()
+
+    def _connect(self):
+        logging.info("[ADE-PARSER] Connecting to ade")
+        url = self.base_url + "?function=connect&login=lecteur1&password="
+
+        response = requests.get(url)
+
+        tree = ElementTree.fromstring(response.text)
+
+        self.session_id = tree.attrib["id"]
+
+    def _disconnect(self):
+        logging.info("[ADE-PARSER] Disconnecting from ade")
+        url = self.base_url + "?function=disconnect"
+
+        response = requests.get(url)
+
+        return response.status_code == 200
+
+    def _set_project_id(self):
+        logging.info("[ADE-PARSER] Setting projet id to ade")
+        url = self.base_url + "?sessionId=" + self.session_id + "&function=setProject&projectId=" + self.project_id
+
+        response = requests.get(url)
+
+        return response.status_code == 200
+
+    def _set_events_to_xml(self):
+        logging.info("[ADE-PARSER] Write xml file")
+        url = self.base_url + "?sessionId=" + self.session_id + "&function=getEvents&tree=true&detail=8"
+
+        response = requests.get(url)
+
+        with open("data/ade.xml", mode="w") as f:
+            f.write(response.text)
+
+
+def main():
+    if download_ics_from_planif():
+        ics_to_json_from_ade()
+        logging.info("[ADE-PARSER] Calendar is up to date")
+
+    download_aurion_groups()
+    download_unites()
+
+    ade_downloader = ADEDownloader()
+    ade_downloader.update_events()
+
+    threading.Timer(600, main).start()
 
 
 if __name__ == "__main__":
