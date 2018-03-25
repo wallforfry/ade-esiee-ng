@@ -1,10 +1,12 @@
 version: '3'
 services:
-  #ade-parser:
-  #  build: ./ade-parser/
+  ade-parser:
+    build:
+      context: ./ade-parser
+      dockerfile: Dockerfile
 
-  #  volumes:
-  #    - data:/usr/src/app
+    volumes:
+      - data:/usr/src/app/data
 
   api:
     build:
