@@ -57,24 +57,12 @@ def ics_to_json_from_ade():
         f.close()
         logging.info("[ADE-PARSER] Json file is up to date")
 
-
-def get_json_calendar():
-    try:
-        with open("data/calendar.json", "r") as f:
-            events = json.load(f)
-            f.close()
-            return events
-
-    except Exception as e:
-        print(e)
-        return None
-
-
 def main():
     if download_ics_from_planif():
         ics_to_json_from_ade()
         logging.info("[ADE-PARSER] Calendar is up to date")
     download_aurion_groups()
+    download_unites()
     threading.Timer(600, main).start()
 
 
@@ -88,6 +76,18 @@ def download_aurion_groups():
         file.writelines(f)
         file.close()
         logging.info("[ADE-PARSER] Aurion groups are up to date")
+
+
+def download_unites():
+    url = "http://test.wallforfry.fr/BDE_UNITES.csv"
+
+    response = requests.get(url)
+    f = response.content.decode("utf-8")
+
+    with open("data/BDE_UNITES.csv", "w") as file:
+        file.writelines(f)
+        file.close()
+        logging.info("[ADE-PARSER] Unites names are up to date")
 
 
 if __name__ == "__main__":

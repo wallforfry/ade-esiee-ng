@@ -7,4 +7,4 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD [ "python", "./ade-esiee-ng.py" ]
+CMD [ "python", "./ade_esiee_ng.py" ]
