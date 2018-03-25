@@ -9,9 +9,11 @@ import urllib.error
 
 import json
 
+import requests
 from icalendar import Calendar
 import time, threading
 import logging
+
 
 def download_ics_from_planif():
     url = "https://planif.esiee.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=147,738,739,743,744,2841,5757,746,747,748,2781,2782,3286,682,683,684,685,659,665,674,680,681,727,733,785,998,1295,2555,2743,5215,5688,731,734,735,736,740,741,742,780,782,1852,2584,4350,5321,786,787,788,789,790,2270,2275,2277,2278,2282,704,745,773,775,776,4937,728,2117,772,719,2112,183,185,196,4051,4679,2072,2074,2272,2276,2089,154,713,163,167,700,701,705,707,708,712,714,715,716,724,725,726,737,749,758,759,1057,1858,1908,2090,2108,2281,428,717,720,721,722,2265,2274,2279&projectId=7&calType=ical&nbWeeks=12"
@@ -68,14 +70,27 @@ def get_json_calendar():
         return None
 
 
-def update_calendar():
+def main():
     if download_ics_from_planif():
         ics_to_json_from_ade()
         logging.info("[ADE-PARSER] Calendar is up to date")
-    threading.Timer(600, update_calendar).start()
+    download_aurion_groups()
+    threading.Timer(600, main).start()
+
+
+def download_aurion_groups():
+    url = "http://test.wallforfry.fr/BDE_MES_GROUPES.csv"
+
+    response = requests.get(url)
+    f = response.content.decode("utf-8")
+
+    with open("data/BDE_MES_GROUPES.csv", "w") as file:
+        file.writelines(f)
+        file.close()
+        logging.info("[ADE-PARSER] Aurion groups are up to date")
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
     logging.info("[ADE-PARSER] Starting..")
-    update_calendar()
+    main()
