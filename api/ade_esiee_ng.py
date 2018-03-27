@@ -13,8 +13,8 @@ app = Flask(__name__)
 @app.route("/agenda/<mail>", methods=['GET', 'POST'])
 @app.route("/api/ade-esiee/agenda/<mail>", methods=['GET', 'POST'])
 def get_agenda_mail(mail):
-    #ade = ADECalendar()
-    ade = ADEApi()
+    ade = ADECalendar()
+    #ade = ADEApi()
 
     try:
         aurion = Aurion()
@@ -43,8 +43,8 @@ def get_agenda():
         return render_template("index.html")
 
     mail = request.form['mail']
-    #ade = ADECalendar()
-    ade = ADEApi()
+    ade = ADECalendar()
+    #ade = ADEApi()
 
     try:
         aurion = Aurion()
