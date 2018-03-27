@@ -20,7 +20,6 @@ def get_agenda_mail(mail):
         aurion = Aurion()
         unites_and_groups = aurion.get_unites_and_groups_from_csv(mail)
         ade.set_groups_unites(unites_and_groups)
-
         result = ade.get_all_cours()
         if not result:
             return "[{\"error\": \"No events\"}]"

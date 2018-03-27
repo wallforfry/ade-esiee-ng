@@ -5,7 +5,8 @@ Author : DELEVACQ Wallerand
 Date : 21/03/2017
 """
 import csv
-import json
+
+import ujson
 import urllib.request
 import urllib.error
 import re
@@ -26,14 +27,13 @@ class ADECalendar():
         '''
         Get and set event to all_cours variable
         '''
-
         self.all_cours = self.get_json_calendar()
 
     @staticmethod
     def get_json_calendar():
         try:
-            with open("data/calendar.json", "r") as f:
-                events = json.load(f)
+            with open("data/calendar.json", "r", encoding="UTF-8") as f:
+                events = ujson.load(f)
                 f.close()
                 return events
 
@@ -43,16 +43,14 @@ class ADECalendar():
 
     @staticmethod
     def search_unite_from_csv(unite_code):
-        with open("data/BDE_MES_GROUPES.csv", "r") as f:
+        with open("data/BDE_UNITES.csv", "r") as f:
             lines = f.readlines()
             fieldsnames = ["Code.Unité", "Libellé.Unité"]
             data = csv.DictReader(lines, fieldsnames, delimiter=';')
             for row in data:
                 if unite_code.replace("-", "_") in row.get(fieldsnames[0]):
                     return row.get(fieldsnames[1])
-
             return ""
-
     def get_cours_of(self, day, month):
         """
         Main method
@@ -75,7 +73,6 @@ class ADECalendar():
         """
         data = self.all_cours
         all = self.get_cours_by_unites_and_groups(data, self.groups_unites)
-
         return [{"name": elt['name'], "start": elt['start'], "end": elt['end'], "rooms": elt["rooms"][0],
                  "prof": self.prof_finder(elt), "unite": self.unite_name_finder(elt["name"]),
                  "description": elt['description']} for elt in

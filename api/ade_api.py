@@ -5,11 +5,10 @@ Author : DELEVACQ Wallerand
 Date : 25/03/18
 """
 import csv
-import json
+import ujson
 import logging
 import re
 from datetime import datetime, timedelta
-
 import requests
 from xml.etree import ElementTree
 
@@ -190,7 +189,7 @@ class ADEApi():
     def get_json_calendar():
         try:
             with open("data/calendar.json", "r") as f:
-                events = json.load(f)
+                events = ujson.load(f)
                 f.close()
                 return events
 
@@ -200,7 +199,7 @@ class ADEApi():
 
     @staticmethod
     def search_unite_from_csv(unite_code):
-        with open("data/BDE_MES_GROUPES.csv", "r") as f:
+        with open("data/BDE_UNITES.csv", "r") as f:
             lines = f.readlines()
             fieldsnames = ["Code.Unité", "Libellé.Unité"]
             data = csv.DictReader(lines, fieldsnames, delimiter=';')
