@@ -34,9 +34,5 @@ services:
     links:
       - api
 
-networks:
-  default:
-    options:
-      - secure
 volumes:
   data:
