@@ -22,17 +22,32 @@ services:
       - 5000
     depends_on:
       - ade-parser
+    deploy:
+      labels:
+        - "traefik.port=5000"
+        - "traefik.backend=api"
+        - "traefik.frontend.rule=Path:/"
 
-  nginx:
-    image: 149.202.61.252:6000/nginx
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-
+  traefik:
+    image: traefik:latest
     ports:
       - 5000:80
-    links:
-      - api
+      - 8080:8080
+    networks:
+      - traefik-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    configs:
+      - source: traefik-config
+        target: /etc/traefik/traefik.toml
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+configs:
+  traefik-config:
+    file: ./traefik/config.toml
 
 volumes:
   data:
