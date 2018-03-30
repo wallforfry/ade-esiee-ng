@@ -1,7 +1,7 @@
 version: '3'
 services:
   ade-parser:
-    image: 149.202.61.252:6000/ade-parser
+    image: docker-registry.wallforfry.fr/ade-parser
     build:
       context: ./ade-parser
       dockerfile: Dockerfile
@@ -10,7 +10,7 @@ services:
       - data:/usr/src/app/data
 
   api:
-    image: 149.202.61.252:6000/api
+    image: docker-registry.wallforfry.fr/api
     build:
       context: ./api
       dockerfile: Dockerfile
