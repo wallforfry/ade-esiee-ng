@@ -84,7 +84,7 @@ def download_unites():
 
 
 class ADEDownloader():
-    project_id = "7"
+    project_id = "4"
     base_url = "https://planif.esiee.fr/jsp/webapi"
     session_id = ""
 
