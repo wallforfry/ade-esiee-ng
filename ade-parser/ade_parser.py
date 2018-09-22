@@ -60,7 +60,7 @@ def ics_to_json_from_ade():
 
 
 def download_aurion_groups():
-    url = "https://bde.esiee.fr/aurion-files/mes_groupes.csv"
+    url = "http://test.wallforfry.fr/BDE_MES_GROUPES.csv"
 
     response = requests.get(url)
     f = response.content.decode("utf-8")
@@ -72,7 +72,7 @@ def download_aurion_groups():
 
 
 def download_unites():
-    url = "https://bde.esiee.fr/aurion-files/mes_unites.csv"
+    url = "http://test.wallforfry.fr/BDE_UNITES.csv"
 
     response = requests.get(url)
     f = response.content.decode("utf-8")
@@ -84,7 +84,7 @@ def download_unites():
 
 
 class ADEDownloader():
-    project_id = "4"
+    project_id = "7"
     base_url = "https://planif.esiee.fr/jsp/webapi"
     session_id = ""
 
