@@ -10,7 +10,6 @@ import ujson
 import urllib.request
 import urllib.error
 import re
-import aurion_api
 
 class ADECalendar():
     """
@@ -41,16 +40,16 @@ class ADECalendar():
             print(e)
             return None
 
-    @staticmethod
-    def search_unite_from_csv(unite_code):
+    def search_unite_from_csv(self, unite_code):
         with open("data/BDE_UNITES.csv", "r") as f:
             lines = f.readlines()
             fieldsnames = ["Code.Unité", "Libellé.Unité"]
             data = csv.DictReader(lines, fieldsnames, delimiter=';')
             for row in data:
-                if unite_code.replace("-", "_") in row.get(fieldsnames[0]):
+                if unite_code in self.format_unites_from_csv(row.get(fieldsnames[0])):
                     return row.get(fieldsnames[1])
             return ""
+
     def get_cours_of(self, day, month):
         """
         Main method
@@ -159,39 +158,18 @@ class ADECalendar():
         :return: list of different possible cases of group number
         '''
         back = [m.start() for m in re.finditer("_", data[::-1])]
-        if "EIG_2022" in data:
-            real_group = data[len(data) - back[0]:]
-            return [real_group, real_group[0].upper() + real_group[1:].lower(), real_group[0].lower() + real_group[1:].upper(), real_group.upper(), real_group.lower()]
-        if "EIG" in data:
-            return data[len(data) - 3:len(data) - 2] + data[len(data) - 2:len(data) - 1].lower() + data[len(data):]
 
-        if "PR_3001" in data and len(back) > 4:
-            real_group = data[len(data) - back[0]:].replace("_", "-")
-            return [real_group, real_group[0].upper() + real_group[1:].lower(),
-                    real_group[0].lower() + real_group[1:].upper(), real_group.upper(), real_group.lower()]
-
-        if "PR" in data and len(back) > 4:
-            real_group = data[len(data) - back[1]:].replace("_", "-")
-            return [real_group, real_group[0].upper() + real_group[1:].lower(),
-                    real_group[0].lower() + real_group[1:].upper(), real_group.upper(), real_group.lower()]
-
-        if "EN3" in data:
-            real_group = data[len(data) - back[0]:].replace("_", "-")
-            if len(real_group) >= 2:
-                return [real_group, real_group[0].upper() + real_group[1:].lower(),
-                        real_group[0].lower() + real_group[1:].upper(), real_group.upper(), real_group.lower()]
-            else:
-                return ["xx"]
-
+        #Ajoute le groupe de promo par (ex: E4FI)
         if len(back) <= 1:
             # return [data[data.find("_")+1:]]
             return ["", data[data.find("_") + 1:]]
 
+
         real_group = data[len(data) - back[0]:]
+
         if len(real_group) >= 2:
             return [real_group, real_group[0].upper() + real_group[1:].lower(),
                     real_group[0].lower() + real_group[1:].upper(), real_group.upper(), real_group.lower()]
-        # elif not "EN3" in data:
         else:
             return [real_group, real_group.upper(), real_group.lower()]
 
@@ -205,6 +183,24 @@ class ADECalendar():
         real_unites = data[:]  # back[0]+1
         return real_unites
 
+    def format_unites_from_csv(self, data):
+        '''
+           :param data: row of BDE_UNITES.csv
+           :return: unite name formatted likes unite name in calendar api
+       '''
+        back = [m.start() for m in re.finditer("_", data)]
+
+        if len(back) <= 1:
+            return ""
+
+        real_group = data[back[1] + 1:]
+        real_group = real_group.replace("_", "-")
+
+        if len(back) == 2:
+            real_group = real_group[:2] + "-" + real_group[2:]
+
+        return real_group
+
     def format_unites(self, data):
         '''
 
@@ -212,27 +208,14 @@ class ADECalendar():
         :return: unite name formatted likes unite name in calendar api
         '''
         back = [m.start() for m in re.finditer("_", data)]
-        if len(back) == 1:
-            real_group = data[back[0] + 1:]
-            real_group = real_group.replace("_", "-")
-            # Correction pour les noms de promos
-            real_group += ":"
-            return real_group
-        if len(back) == 3:  # 16_E4FR_RE4R23_2R
+        if len(back) == 3:
             real_group = data[back[1] + 1:back[2]]
+            real_group = real_group[:2] + "_" + real_group[2:]
             real_group = real_group.replace("_", "-")
             return real_group
         if len(back) == 4:  # 16_E2_IGE_2102_2
             real_group = data[back[1] + 1:back[3]]
             real_group = real_group.replace("_", "-")
-            return real_group
-        if len(back) == 5:  # 16_E2_ESP_2003_S2_2
-            if "PR" in data:
-                real_group = data[back[1] + 1:back[3]]
-                real_group = real_group.replace("_", "-")
-            else:
-                real_group = data[back[1] + 1:back[4]]
-                real_group = real_group.replace("_", "-")
             return real_group
 
     def prof_finder(self, data):
@@ -252,8 +235,4 @@ class ADECalendar():
         :param data: row of aurion provided data
         :return: unite natural name
         '''
-        # for unite_name in self.groups_unites:
-        #    #print(unite_name["unite"]+" "+data[:data.find(":")])
-        #    if unite_name["unite"] == data[:data.find(":")]:
-        #        return unite_name["name"]
         return self.search_unite_from_csv(data[:data.find(":")])

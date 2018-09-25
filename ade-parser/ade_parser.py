@@ -84,7 +84,7 @@ def download_unites():
 
 
 class ADEDownloader():
-    project_id = "7"
+    project_id = "4"
     base_url = "https://planif.esiee.fr/jsp/webapi"
     session_id = ""
 
@@ -131,15 +131,19 @@ class ADEDownloader():
 
 
 def main():
-    if download_ics_from_planif():
-        ics_to_json_from_ade()
-        logging.info("[ADE-PARSER] Calendar is up to date")
 
-    download_aurion_groups()
-    download_unites()
+    use_api = False
 
-    ade_downloader = ADEDownloader()
-    ade_downloader.update_events()
+    if not use_api:
+        if download_ics_from_planif():
+            ics_to_json_from_ade()
+            logging.info("[ADE-PARSER] Calendar is up to date")
+    else:
+        ade_downloader = ADEDownloader()
+        ade_downloader.update_events()
+
+    #download_aurion_groups()
+    #download_unites()
 
     threading.Timer(600, main).start()
 

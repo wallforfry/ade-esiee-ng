@@ -3,12 +3,15 @@ import logging
 
 from flask import Flask, request, render_template
 
-from aurion_api import Aurion
-from calendar_api import ADECalendar
-from ade_api import ADEApi
+
+from api.aurion_api import Aurion
+from api.calendar_api import ADECalendar
 
 app = Flask(__name__)
 
+@app.route("/", methods=['GET'])
+def index():
+    return "Welcome to ADE-ESIEE API developed by Wall-e"
 
 @app.route("/agenda/<mail>", methods=['GET', 'POST'])
 @app.route("/api/ade-esiee/agenda/<mail>", methods=['GET', 'POST'])
