@@ -4,14 +4,30 @@ import logging
 from flask import Flask, request, render_template
 
 
-from api.aurion_api import Aurion
-from api.calendar_api import ADECalendar
+from aurion_api import Aurion
+from calendar_api import ADECalendar
 
 app = Flask(__name__)
 
 @app.route("/", methods=['GET'])
 def index():
     return "Welcome to ADE-ESIEE API developed by Wall-e"
+
+@app.route("/rooms/<hour>", methods=['GET'])
+@app.route("/api/rooms/<hour>", methods=['GET'])
+@app.route("/api/ade-esiee/rooms/<hour>", methods=['GET'])
+def get_free_rooms(hour):
+    if not hour:
+        hour = 0
+    ade = ADECalendar()
+    free_rooms = json.dumps(ade.get_free_rooms(int(hour)))
+    response = app.response_class(
+        response=free_rooms,
+        status=200,
+        mimetype='application/json'
+    )
+    return response
+
 
 @app.route("/agenda/<mail>", methods=['GET', 'POST'])
 @app.route("/api/ade-esiee/agenda/<mail>", methods=['GET', 'POST'])

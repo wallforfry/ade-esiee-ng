@@ -11,6 +11,9 @@ import urllib.request
 import urllib.error
 import re
 
+import datetime
+
+
 class ADECalendar():
     """
     ADECalendar class allow to get ESIEE Calendar from https://bde.esiee.fr/api/calendar/activities api
@@ -138,6 +141,15 @@ class ADECalendar():
         '''
         return [elt for elt in cours if elt['start'][8:10] == day]
 
+    def get_cours_by_hour(self, cours, hour):
+        '''
+
+        :param cours: cours database
+        :param hour: hour which must be find
+        :return: cours of the day
+        '''
+        return [elt for elt in cours if elt['start'][11:13] <= hour < elt['end'][11:13]]
+
     def set_groups_unites(self, aurion_data):
         '''
 
@@ -236,3 +248,24 @@ class ADECalendar():
         :return: unite natural name
         '''
         return self.search_unite_from_csv(data[:data.find(":")])
+
+    def get_free_rooms(self, hour):
+        now = datetime.datetime.now()
+        current_day = "0"+str(now.day) if len(str(now.day)) == 1 else str(now.day)
+        current_month = "0"+str(now.month) if len(str(now.month)) == 1 else str(now.month)
+        current_hour = now.hour+hour
+        print(current_hour)
+        current_hour = "0"+str(current_hour) if len(str(current_hour)) == 1 else str(current_hour)
+        data = self.all_cours
+        month = self.get_cours_by_month(data, current_month)
+        day = self.get_cours_by_day(month, current_day)
+        hour = self.get_cours_by_hour(day, current_hour)
+
+        rooms = []
+        lists = [elt["rooms"] for elt in hour]
+
+        for groups in lists:
+            for elt in groups:
+                rooms.append(elt)
+
+        return rooms
