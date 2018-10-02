@@ -25,76 +25,22 @@ class ADECalendar():
     all_cours = []
     groups_unites = []
 
-    rooms_available = [
-    "0110",
-    "0112",
-    "0113",
-    "0114",
-    "0115",
-    "0160",
-    "0210",
-    "0260",
-    "1005",
-    "1007",
-    "1051",
-    "1103",
-    "1105",
-    "1107",
-    "1109",
-    "1201",
-    "1205",
-    "1207",
-    "1301",
-    "1305",
-    "1307",
-    "1309",
-    "1401",
-    "1403",
-    "1405",
-    "1407",
-    "1409",
-    "2101",
-    "2102",
-    "2103",
-    "2104",
-    "2105",
-    "2107",
-    "2108",
-    "2201",
-    "2205",
-    "2207",
-    "2209",
-    "3001",
-    "3005",
-    "3007",
-    "3051",
-    "3053",
-    "3103",
-    "3105",
-    "3107",
-    "3109",
-    "3201",
-    "3203",
-    "3207",
-    "3305",
-    "3307",
-    "4201",
-    "4307",
-    "4401",
-    "4403",
-    "4405",
-    "4451",
-    "5004",
-    "5006",
-    "5008",
-    "5407"
-  ]
+    rooms_available = []
 
     def __init__(self):
         '''
         Get and set event to all_cours variable
         '''
         self.all_cours = self.get_json_calendar()
+        try:
+            with open("data/rooms.json", "r", encoding="UTF-8") as f:
+                self.rooms_available = ujson.load(f)
+                f.close()
+
+        except Exception as e:
+            print(e)
+
+        print(self.rooms_available)
 
     @staticmethod
     def get_json_calendar():

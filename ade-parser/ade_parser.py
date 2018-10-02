@@ -82,6 +82,16 @@ def download_unites():
         file.close()
         logging.info("[ADE-PARSER] Unites names are up to date")
 
+def download_files():
+    url = "http://test.wallforfry.fr/rooms.json"
+
+    response = requests.get(url)
+    f = response.content.decode("utf-8")
+
+    with open("data/rooms.json", "w") as file:
+        file.writelines(f)
+        file.close()
+        logging.info("[ADE-PARSER] Rooms are up to date")
 
 class ADEDownloader():
     project_id = "4"
@@ -142,8 +152,9 @@ def main():
         ade_downloader = ADEDownloader()
         ade_downloader.update_events()
 
-    #download_aurion_groups()
-    #download_unites()
+    download_aurion_groups()
+    download_unites()
+    download_files()
 
     threading.Timer(600, main).start()
 
