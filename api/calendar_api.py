@@ -25,6 +25,71 @@ class ADECalendar():
     all_cours = []
     groups_unites = []
 
+    rooms_available = [
+    "0110",
+    "0112",
+    "0113",
+    "0114",
+    "0115",
+    "0160",
+    "0210",
+    "0260",
+    "1005",
+    "1007",
+    "1051",
+    "1103",
+    "1105",
+    "1107",
+    "1109",
+    "1201",
+    "1205",
+    "1207",
+    "1301",
+    "1305",
+    "1307",
+    "1309",
+    "1401",
+    "1403",
+    "1405",
+    "1407",
+    "1409",
+    "2101",
+    "2102",
+    "2103",
+    "2104",
+    "2105",
+    "2107",
+    "2108",
+    "2201",
+    "2205",
+    "2207",
+    "2209",
+    "3001",
+    "3005",
+    "3007",
+    "3051",
+    "3053",
+    "3103",
+    "3105",
+    "3107",
+    "3109",
+    "3201",
+    "3203",
+    "3207",
+    "3305",
+    "3307",
+    "4201",
+    "4307",
+    "4401",
+    "4403",
+    "4405",
+    "4451",
+    "5004",
+    "5006",
+    "5008",
+    "5407"
+  ]
+
     def __init__(self):
         '''
         Get and set event to all_cours variable
@@ -253,7 +318,7 @@ class ADECalendar():
         now = datetime.datetime.now()
         current_day = "0"+str(now.day) if len(str(now.day)) == 1 else str(now.day)
         current_month = "0"+str(now.month) if len(str(now.month)) == 1 else str(now.month)
-        current_hour = now.hour+hour
+        current_hour = now.hour+int(hour)
         print(current_hour)
         current_hour = "0"+str(current_hour) if len(str(current_hour)) == 1 else str(current_hour)
         data = self.all_cours
@@ -266,6 +331,11 @@ class ADECalendar():
 
         for groups in lists:
             for elt in groups:
-                rooms.append(elt)
+                if (len(elt)) > 4:
+                    rooms.append(elt[:4])
+                else:
+                    rooms.append(elt)
 
-        return rooms
+        rooms_available_set = set(self.rooms_available)
+        rooms_available_list = list(rooms_available_set.difference(set(rooms)))
+        return sorted(rooms_available_list)
