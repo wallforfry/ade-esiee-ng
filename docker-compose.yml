@@ -8,6 +8,8 @@ services:
 
     volumes:
       - data:/usr/src/app/data
+    deploy:
+      mode: global
 
   api:
     image: wallforfry/api
