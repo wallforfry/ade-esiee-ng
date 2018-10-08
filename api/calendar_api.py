@@ -75,7 +75,7 @@ class ADECalendar():
         all = self.get_cours_by_unites_and_groups(data, self.groups_unites)
         all = self.get_cours_by_month(all, month)
         all = self.get_cours_by_day(all, day)
-        return [{"name": elt['name'], "start": elt['start'], "end": elt['end'], "rooms": elt["rooms"][0],
+        return [{"name": elt['name'], "start": elt['start'], "end": elt['end'], "rooms": self.get_rooms(elt["rooms"]),
                  "prof": self.prof_finder(elt), "unite": self.unite_name_finder(elt["name"])} for elt in
                 all]
 
@@ -86,11 +86,17 @@ class ADECalendar():
         """
         data = self.all_cours
         all = self.get_cours_by_unites_and_groups(data, self.groups_unites)
-        return [{"name": elt['name'], "start": elt['start'], "end": elt['end'], "rooms": elt["rooms"][0],
+        return [{"name": elt['name'], "start": elt['start'], "end": elt['end'], "rooms": self.get_rooms(elt["rooms"]),
                  "prof": self.prof_finder(elt), "unite": self.unite_name_finder(elt["name"]),
                  "description": elt['description']} for elt in
                 all]
 
+    def get_rooms(self, rooms_list):
+        rooms = ""
+        for elt in rooms_list:
+            rooms = rooms + elt + " "
+
+        return rooms
     def is_group(self, description, name, groupe):
         '''
 
