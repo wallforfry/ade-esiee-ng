@@ -1,3 +1,4 @@
 Flask
 requests
 ujson
+flask-cors

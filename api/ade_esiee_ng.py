@@ -2,12 +2,13 @@ import json
 import logging
 
 from flask import Flask, request, render_template
-
+from flask_cors import CORS
 
 from aurion_api import Aurion
 from calendar_api import ADECalendar
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/", methods=['GET'])
 def index():
